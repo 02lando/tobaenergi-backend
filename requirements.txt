@@ -2,3 +2,5 @@ Flask
 fpdf
 requests
 flask-cors
+waitress
+
