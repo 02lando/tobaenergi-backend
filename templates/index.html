@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator PLTS Atap - PT Toba Energi Nusajaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tambahan style untuk surat */
+        .letter-container {
+            font-family: 'Times New Roman', serif; /* Font serif untuk kesan formal */
+            line-height: 1.6;
+            color: black; /* Mengubah warna dasar menjadi hitam */
+        }
+        .letter-header {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: black;
+        }
+        .letter-body {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+            color: black;
+        }
+        .letter-list {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            list-style-type: none; /* Hilangkan bullet default */
+            color: black;
+        }
+        .letter-list li {
+            position: relative;
+            padding-left: 1rem;
+        }
+        .letter-list li::before {
+            content: "-";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: black;
+        }
+        .highlight {
+            font-weight: bold;
+            color: black; /* Diubah dari biru menjadi hitam */
+        }
+        .disclaimer {
+            font-size: 0.8rem;
+            color: black; /* Diubah menjadi hitam */
+            font-style: italic;
+            border-top: 1px solid #000; /* Garis batas hitam */
+            margin-top: 2rem;
+            padding-top: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl"> 
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6 font-sans">Estimasi PLTS Atap</h1>
+        
+        <form id="solarForm" class="space-y-4 font-sans">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Nama Pelanggan</label>
+                <input type="text" id="nama" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: Budi Santoso" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Koordinat Lokasi (Lat, Lon)</label>
+                <div class="flex space-x-2">
+                    <input type="text" id="coordinates" class="flex-grow border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500" required placeholder="-6.2000, 106.8000">
+                    <button type="button" id="getGpsBtn" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md transition duration-150">Ambil GPS</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tagihan Listrik (Rp)</label>
+                    <input type="number" id="tagihanListrik" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500" required placeholder="1500000">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tarif (Rp/kWh)</label>
+                    <input type="number" id="tarifListrik" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="1699.53" value="1699.53">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Target Penghematan (%)</label>
+                <input type="number" id="penghematan" value="50" min="10" max="100" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            
+            <button type="submit" id="submitButton" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-bold transition duration-150 shadow-md">
+                Hitung Estimasi Proposal
+            </button>
+        </form>
+
+        <div id="resultSection" class="hidden mt-8 pt-6 border-t-2 border-dashed border-gray-300">
+            
+            <div class="letter-container bg-white p-4 border border-gray-100 rounded shadow-sm">
+                <div id="proposalContent">
+                    </div>
+
+                <div class="mt-6 mb-4 font-sans text-left"> <p class="text-black">Hormat kami,</p> <p class="text-black font-bold text-lg mt-1">Toba Energi Nusajaya</p> </div>
+
+                <div class="disclaimer">
+                    <strong>Disclaimer:</strong> Data ini merupakan hasil simulasi estimasi awal. Hasil aktual dan final akan disesuaikan kembali berdasarkan survei teknis dan penawaran resmi.
+                </div>
+            </div>
+            
+            <div class="mt-6 space-y-3 font-sans">
+                <button id="waBtn" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-md font-bold flex items-center justify-center gap-2 shadow-lg transition duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592z"/>
+                    </svg>
+                    Konsultasikan Hasil Ini ke WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const API_DOMAIN = ''; 
+    let lastResult = null;
+    let lastInput = null;
+
+    // --- Fungsi Helper Format Angka ---
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+    }
+    function formatNumber(angka) {
+        return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(angka);
+    }
+
+    // --- Tombol GPS ---
+    document.getElementById('getGpsBtn').addEventListener('click', () => {
+        const btn = document.getElementById('getGpsBtn');
+        btn.textContent = 'Mencari...';
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                document.getElementById('coordinates').value = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+                btn.textContent = 'Sukses!';
+                setTimeout(() => btn.textContent = 'Ambil GPS', 2000);
+            },
+            err => {
+                alert('Gagal mengambil lokasi GPS. Pastikan izin lokasi aktif.');
+                btn.textContent = 'Ambil GPS';
+            }
+        );
+    });
+
+    // --- Handle Submit Formulir ---
+    document.getElementById('solarForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitButton');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sedang Menganalisa...'; submitBtn.disabled = true;
+
+        const inputData = {
+            nama: document.getElementById('nama').value,
+            coordinates: document.getElementById('coordinates').value,
+            tagihan: parseFloat(document.getElementById('tagihanListrik').value),
+            tarif: parseFloat(document.getElementById('tarifListrik').value) || 1699.53,
+            hemat: parseFloat(document.getElementById('penghematan').value)
+        };
+
+        try {
+            // 1. Ambil Data PVOUT
+            const resPv = await fetch(`${API_DOMAIN}/api/pvout`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({coordinates: inputData.coordinates})
+            });
+            const dataPv = await resPv.json();
+            if(dataPv.status !== 'success') throw new Error(dataPv.message);
+
+            // 2. Hitung Ekonomi (BEP)
+            const resCalc = await fetch(`${API_DOMAIN}/api/calculate_bep`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    pvout_annual: dataPv.raw_value,
+                    tagihan_listrik: inputData.tagihan,
+                    tarif_listrik: inputData.tarif,
+                    penghematan_persen: inputData.hemat,
+                    nama: inputData.nama,
+                    coordinates: inputData.coordinates
+                })
+            });
+            const dataCalc = await resCalc.json();
+            if(dataCalc.status !== 'success') throw new Error(dataCalc.message);
+
+            lastResult = dataCalc;
+            lastInput = inputData;
+            
+            // 3. Render Tampilan Surat
+            renderProposalLetter(inputData, dataCalc, dataPv.raw_value);
+            
+            document.getElementById('resultSection').classList.remove('hidden');
+            // Scroll ke hasil
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+
+        } catch (err) {
+            alert('Terjadi kesalahan: ' + err.message);
+        } finally {
+            submitBtn.textContent = originalText; submitBtn.disabled = false;
+        }
+    });
+
+    // --- Fungsi Render Surat ---
+    function renderProposalLetter(input, result, pvoutVal) {
+        const container = document.getElementById('proposalContent');
+        
+        // Hitung Kebutuhan kWh (Tagihan / TDL)
+        const kebutuhanKwh = input.tagihan / input.tarif;
+
+        // HTML Template Surat
+        container.innerHTML = `
+            <div class="letter-header">
+                Yth. Bapak/Ibu <span class="highlight">${input.nama}</span>,
+            </div>
+
+            <div class="letter-body">
+                <p class="mb-4">
+                    Terima kasih atas ketertarikan Bapak/Ibu terhadap solusi Pembangkit Listrik Tenaga Surya (PLTS). 
+                    Berdasarkan data yang Bapak/Ibu berikan, dengan estimasi kebutuhan energi bulanan rata-rata sebesar 
+                    <span class="highlight">${formatNumber(kebutuhanKwh)} kWh/bulan</span>, serta target penghematan 
+                    sekitar <span class="highlight">${input.hemat}%</span>, kami telah melakukan perhitungan teknis 
+                    menggunakan nilai irradiance (PVOUT) yang bersumber dari PVGIS (JRC – European Commission).
+                </p>
+
+                <p class="mb-4">
+                    Nilai PVOUT untuk lokasi Bapak/Ibu adalah 
+                    <span class="highlight">${formatNumber(pvoutVal)} kWh/kWp/tahun</span>, 
+                    yang menjadi dasar dalam penentuan estimasi kapasitas PLTS. 
+                    Dari analisa tersebut, kapasitas sistem yang direkomendasikan adalah:
+                </p>
+
+                <ul class="letter-list">
+                    <li>Kapasitas PLTS: <span class="highlight">${result.Kapasitas_kWp} kWp</span></li>
+                    <li>Investasi: <span class="highlight">Rp ${result.Total_Investasi.toLocaleString('id-ID')}</span></li>
+                </ul>
+
+                <p class="mb-2">Dengan kapasitas tersebut, sistem PLTS diperkirakan dapat memberi potensi penghematan sebagai berikut:</p>
+                <ul class="letter-list">
+                    <li>Potensi Penghematan Bulanan: <strong>Rp ${(result.Penghematan_Tahunan_Rp / 12).toLocaleString('id-ID', {maximumFractionDigits:0})}</strong></li>
+                    <li>Potensi Penghematan Tahunan: <strong>Rp ${result.Penghematan_Tahunan_Rp.toLocaleString('id-ID', {maximumFractionDigits:0})}</strong></li>
+                    <li>Perkiraan BEP: <strong>${result.BEP_Tahun} Tahun</strong></li>
+                </ul>
+
+                <p class="mt-4">
+                    Perhitungan ini merujuk pada tarif dasar listrik saat ini yaitu 
+                    <strong>Rp ${input.tarif.toLocaleString('id-ID')}/kWh</strong>. 
+                    Sehingga simulasi ini dapat digunakan sebagai referensi awal yang baik, dan nilai final akan disesuaikan pada saat penyusunan penawaran resmi.
+                </p>
+
+                <p class="mt-4">
+                    Kami siap membantu Bapak/Ibu dalam diskusi lanjutan mengenai opsi kapasitas, konfigurasi teknis, dan penawaran resmi berdasarkan kondisi lapangan. Apabila ada pertanyaan, dengan senang hati siap mendukung.
+                </p>
+            </div>
+        `;
+    }
+
+    // --- Tombol WhatsApp (REVISI: Menambahkan data input) ---
+    document.getElementById('waBtn').addEventListener('click', () => {
+        if (!lastResult) return;
+        
+        // Format angka untuk pesan WA
+        const tagihanFormatted = lastInput.tagihan.toLocaleString('id-ID', {maximumFractionDigits:0});
+        // TDL biasanya memiliki 2 angka di belakang koma (misal: 1699.53)
+        const tarifFormatted = lastInput.tarif.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2}); 
+        const investasiFormatted = lastResult.Total_Investasi.toLocaleString('id-ID', {maximumFractionDigits:0});
+        
+        const msg = `Halo Toba Energi Nusajaya,
+
+Saya ${lastInput.nama} baru saja melakukan simulasi PLTS di website.
+
+*Data Input Awal:*
+- Tagihan Listrik Bulanan: Rp ${tagihanFormatted}
+- Tarif Dasar Listrik (TDL): Rp ${tarifFormatted}/kWh
+- Target Penghematan: ${lastInput.hemat}%
+- Lokasi: ${lastInput.coordinates}
+
+*Hasil Simulasi:*
+- Kapasitas PLTS: ${lastResult.Kapasitas_kWp} kWp
+- Estimasi Investasi: Rp ${investasiFormatted}
+
+Saya ingin konsultasi lebih lanjut mengenai penawaran ini. Terima kasih.`;
+        
+        window.open(`https://wa.me/6285370716686?text=${encodeURIComponent(msg)}`, '_blank');
+    });
+</script>
+</body>
+</html>
