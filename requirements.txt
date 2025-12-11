@@ -1,4 +1,4 @@
 Flask
-requests
 fpdf
-gunicorn
+requests
+flask-cors
