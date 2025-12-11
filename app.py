@@ -1,11 +1,12 @@
 # app.py
+import os
 from flask import Flask, request, jsonify, render_template, send_file
 from calculator import get_pvout_annual, calculate_solar_economics, PANEL_WATT_PEAK
 import io
 from fpdf import FPDF
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 CORS(app)
 
 # Utility function
@@ -14,7 +15,6 @@ def format_rupiah(angka):
         return f"Rp {float(angka):,.0f}".replace(",", "_").replace(".", ",").replace("_", ".")
     except:
         return "Rp -"
-
 
 # --- FUNGSI PEMBUAT PDF (SAFE) ---
 def create_proposal_pdf(data):
@@ -134,7 +134,6 @@ def create_proposal_pdf(data):
 
     return pdf
 
-
 # --- API ENDPOINTS ---
 @app.route('/api/pvout', methods=['POST'])
 def api_pvout():
@@ -155,7 +154,6 @@ def api_pvout():
 
     return jsonify({"status": "success", "pvout_value": result['pvout_formatted'], "raw_value": result['pvout_numeric']})
 
-
 @app.route('/api/calculate_bep', methods=['POST'])
 def api_calculate_bep():
     try:
@@ -172,7 +170,6 @@ def api_calculate_bep():
     except Exception as e:
         return jsonify({"status": "failed", "message": str(e)}), 500
 
-
 @app.route('/api/generate_pdf', methods=['POST'])
 def api_generate_pdf():
     try:
@@ -184,7 +181,6 @@ def api_generate_pdf():
     except Exception as e:
         return jsonify({"status": "failed", "message": str(e)}), 500
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -194,5 +190,3 @@ if __name__ == '__main__':
     from waitress import serve
     port = int(os.environ.get("PORT", 5000))
     serve(app, host="0.0.0.0", port=port)
-
-
