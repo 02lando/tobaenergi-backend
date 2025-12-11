@@ -4,10 +4,9 @@ from calculator import get_pvout_annual, calculate_solar_economics, PANEL_WATT_P
 import io
 from fpdf import FPDF
 from flask_cors import CORS
-CORS(app)
 
 app = Flask(__name__)
-
+CORS(app)
 
 # Utility function
 def format_rupiah(angka):
@@ -195,4 +194,5 @@ if __name__ == '__main__':
     from waitress import serve
     port = int(os.environ.get("PORT", 5000))
     serve(app, host="0.0.0.0", port=port)
+
 
