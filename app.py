@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify, render_template, send_file
 from calculator import get_pvout_annual, calculate_solar_economics, PANEL_WATT_PEAK
 import io
 from fpdf import FPDF
+from flask_cors import CORS
+CORS(app)
 
 app = Flask(__name__)
 
@@ -193,3 +195,4 @@ if __name__ == '__main__':
     from waitress import serve
     port = int(os.environ.get("PORT", 5000))
     serve(app, host="0.0.0.0", port=port)
+
